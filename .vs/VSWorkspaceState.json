@@ -3,8 +3,9 @@
     "",
     "\\source",
     "\\source\\ExternalDLL",
-    "\\source\\FaceRecognitionGUI"
+    "\\source\\FaceRecognitionGUI",
+    "\\source\\FaceRecognitionGUI\\FaceRecognitionGUI\\Properties",
+    "\\source\\FaceRecognitionGUI\\FaceRecognitionGUI\\Resources"
   ],
-  "SelectedNode": "\\source\\ExternalDLL\\ExternalDLL2017.sln",
   "PreviewInSolutionExplorer": false
 }
