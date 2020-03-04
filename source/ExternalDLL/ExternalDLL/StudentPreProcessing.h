@@ -6,6 +6,9 @@
 
 #pragma once
 #include "PreProcessing.h"
+#include "Gaussian.hpp"
+#include "Mask.hpp"
+
 class StudentPreProcessing : public PreProcessing {
 public:
 	IntensityImage * stepToIntensityImage(const RGBImage &image) const;
