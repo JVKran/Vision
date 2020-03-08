@@ -6,10 +6,49 @@
 
 #pragma once
 #include "PreProcessing.h"
-#include "Gaussian.hpp"
-#include "Mask.hpp"
+#include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/types_c.h"
+
+//void imageToMat(const IntensityImage& orignalImage, cv::Mat& destinationMat);
+//void matToImage(const cv::Mat& originalMat, IntensityImage& destinationImage);
 
 class StudentPreProcessing : public PreProcessing {
+private:
+	cv::Mat givenLaplacianOperator = (cv::Mat_<float>(9, 9) <<  0, 0, 0, 1, 1, 1, 0, 0, 0,
+																0, 0, 0, 1, 1, 1, 0, 0, 0,
+																0, 0, 0, 1, 1, 1, 0, 0, 0,
+																1, 1, 1,-4,-4,-4, 1, 1, 1,
+																1, 1, 1,-4,-4,-4, 1, 1, 1,
+																1, 1, 1,-4,-4,-4, 1, 1, 1,
+																0, 0, 0, 1, 1, 1, 0, 0, 0,
+																0, 0, 0, 1, 1, 1, 0, 0, 0,
+																0, 0, 0, 1, 1, 1, 0, 0, 0);
+
+	cv::Mat verticalSobelOperator = (cv::Mat_<float>(6, 6) <<   -1,-1, 0, 0, 1, 1,
+																-1,-1, 0, 0, 1, 1,
+																-2,-2, 0, 0, 2, 2,
+																-2,-2, 0, 0, 2, 2,
+																-1,-1, 0, 0, 1, 1,
+																-1,-1, 0, 0, 1, 1);
+
+	cv::Mat verticalSobelOperatorSmall = (cv::Mat_<float>(6, 6) <<	-1, 0, 1,
+																	-2, 0, 2,
+																	-1, 0, 1);
+
+	cv::Mat horizontalSobelOperator = (cv::Mat_<float>(6, 6) << 1, 1, 2, 2, 1, 1,
+																1, 1, 2, 2, 1, 1,
+																0, 0, 0, 0, 0, 0,
+																0, 0, 0, 0, 0, 0,
+																-1,-1,-2,-2,-1,-1,
+																-1,-1,-2,-2,-1,-1);
+
+	cv::Mat horizontalSobelOperatorSmall = (cv::Mat_<float>(6, 6) << 1, 2, 1,
+																0, 0, 0,
+																-1,-2,-1);
+
+	IntensityImage * givenEdgeDetector(const IntensityImage& image) const;
+	IntensityImage * cannyEdgeDetector(const IntensityImage& image) const;
+
 public:
 	IntensityImage * stepToIntensityImage(const RGBImage &image) const;
 	IntensityImage * stepScaleImage(const IntensityImage &image) const;

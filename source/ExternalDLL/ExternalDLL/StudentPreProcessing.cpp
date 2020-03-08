@@ -1,71 +1,94 @@
+/*
+* Copyright (c) 2015 DottedEye Designs, Alexander Hustinx, NeoTech Software, Rolf Smit - All Rights Reserved
+* Unauthorized copying of this file, via any medium is strictly prohibited
+* Proprietary and confidential
+*/
+
 #include "StudentPreProcessing.h"
 #include "ImageIO.h"
 #include "GrayscaleAlgorithm.h"
 #include "ImageFactory.h"
 #include "HereBeDragons.h"
-#include "gaussian.hpp"
 
+void imageToMat(const IntensityImage& orignalImage, cv::Mat& destinationMat) {
+	destinationMat.create(orignalImage.getHeight(), orignalImage.getWidth(), CV_8UC1);
 
-IntensityImage * StudentPreProcessing::stepToIntensityImage(const RGBImage &image) const {
-	GrayscaleAlgorithm grayScaleAlgorithm;
-	IntensityImage * newImage = ImageFactory::newIntensityImage();
-	grayScaleAlgorithm.doAlgorithm(image, *newImage);
-	return newImage;
-}
-
-IntensityImage * StudentPreProcessing::stepScaleImage(const IntensityImage &image) const {
-	cv::Mat OverHillOverDale;
-	HereBeDragons::HerLoveForWhoseDearLoveIRiseAndFall(image, OverHillOverDale);
-	int ThoroughBushThoroughBrier = 200 * 200;
-	int OverParkOverPale = OverHillOverDale.cols * OverHillOverDale.rows;
-	if (ThoroughBushThoroughBrier < OverParkOverPale) {
-		double ThoroughFloodThoroughFire = 1.0 / sqrt((double)OverParkOverPale / (double)ThoroughBushThoroughBrier);
-		cv::resize(OverHillOverDale, OverHillOverDale, cv::Size(), ThoroughFloodThoroughFire, ThoroughFloodThoroughFire, cv::INTER_LINEAR);
-	}
-	IntensityImage* IDoWanderEverywhere = ImageFactory::newIntensityImage();
-	HereBeDragons::NoWantOfConscienceHoldItThatICall(OverHillOverDale, *IDoWanderEverywhere);
-	return IDoWanderEverywhere;
-}
-
-IntensityImage * StudentPreProcessing::stepEdgeDetection(const IntensityImage &image) const {
-	GaussianFilter filter(1.4, 8);
-	Mask gaussianFilter(filter.getFilter(25));
-	Mask verticalEdgeDetection({{1,0,-1},
-								{2,0,-2},
-								{1,0,-1}}, 3);
-
-	Mask horizontalEdgeDetection({	{1,2,1},
-									{0,0,0},
-									{-1,-2,-1}}, 3);
-
-	Mask allEdgeDetection({ {1, 4, 7, 4, 1},
-							{4, 16, 26, 16, 4},
-							{7, 26, 41, 26, 7},
-							{4, 16, 26, 16, 4},
-							{1, 4, 7, 4, 1} }, 5);
-
-	IntensityImage* smoothenedImage = gaussianFilter.applyMask(image);
-	IntensityImage* verticalEdgeDetectedImage = verticalEdgeDetection.applyMask(*smoothenedImage);
-	IntensityImage* horizontalEdgeDetectedImage = horizontalEdgeDetection.applyMask(*smoothenedImage);
-	IntensityImage* allEdgesDetectedImage = allEdgeDetection.applyMask(*smoothenedImage);
-	IntensityImage* combinedImage = ImageFactory::newIntensityImage(image.getWidth(), image.getHeight());
-
-	for (int x = 0; x < image.getWidth(); x++) {
-		for (int y = 0; y < image.getHeight(); y++) {
-			combinedImage->setPixel(x, y, verticalEdgeDetectedImage->getPixel(x, y));
+	for (int x = 0; x < destinationMat.cols; x++) {
+		for (int y = 0; y < destinationMat.rows; y++) {
+			destinationMat.at<uchar>(y, x) = orignalImage.getPixel(x, y);
 		}
 	}
-
-	//return verticalEdgeDetectedImage;
-	//return smoothenedImage;
-	return allEdgesDetectedImage;
 }
 
-IntensityImage * StudentPreProcessing::stepThresholding(const IntensityImage &image) const {
-	cv::Mat OverHillOverDale;
-	HereBeDragons::HerLoveForWhoseDearLoveIRiseAndFall(image, OverHillOverDale);
-	cv::threshold(OverHillOverDale, OverHillOverDale, 220, 255, cv::THRESH_BINARY_INV);
-	IntensityImage* ThoroughBushThoroughBrier = ImageFactory::newIntensityImage();
-	HereBeDragons::NoWantOfConscienceHoldItThatICall(OverHillOverDale, *ThoroughBushThoroughBrier);
-	return ThoroughBushThoroughBrier;
+void matToImage(const cv::Mat& originalMat, IntensityImage& destinationImage) {
+	if (originalMat.type() != CV_8UC1) {
+		throw std::exception("OpenCV Mat image not an 8-bit single channel image!");
+	}
+
+	destinationImage.set(originalMat.cols, originalMat.rows);
+
+	for (int x = 0; x < originalMat.cols; x++) {
+		for (int y = 0; y < originalMat.rows; y++) {
+			destinationImage.setPixel(x, y, originalMat.at<uchar>(y, x));
+		}
+	}
+}
+
+IntensityImage* StudentPreProcessing::stepToIntensityImage(const RGBImage& image) const {
+	return nullptr;
+}
+
+IntensityImage* StudentPreProcessing::stepScaleImage(const IntensityImage& image) const {
+	return nullptr;
+}
+
+IntensityImage* StudentPreProcessing::stepEdgeDetection(const IntensityImage& image) const {
+	//return givenEdgeDetector(image);
+	return cannyEdgeDetector(image);
+}
+
+IntensityImage* StudentPreProcessing::stepThresholding(const IntensityImage& image) const {
+	cv::Mat convertedMat;
+	imageToMat(image, convertedMat);
+	int threshold = 254;
+	cv::threshold(convertedMat, convertedMat, threshold, 255, cv::THRESH_BINARY_INV);
+	IntensityImage* thresholdedImage = ImageFactory::newIntensityImage();
+	matToImage(convertedMat, *thresholdedImage);
+	return thresholdedImage;
+}
+
+// All implemented edge detectors are listed below.
+
+IntensityImage* StudentPreProcessing::givenEdgeDetector(const IntensityImage& image) const {
+	cv::Mat convertedMat;
+	imageToMat(image, convertedMat);
+	//cv::medianBlur(*image, *image, 3);
+	cv::Mat FilteredImage;
+	filter2D(convertedMat, FilteredImage, CV_8U, givenLaplacianOperator, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
+	IntensityImage* edgeDetectedImage = ImageFactory::newIntensityImage();
+	matToImage(FilteredImage, *edgeDetectedImage);
+	return edgeDetectedImage;
+}
+
+IntensityImage* StudentPreProcessing::cannyEdgeDetector(const IntensityImage& image) const {
+	int filterWidth = 3;
+	int filterHeight = 3;
+	cv::Mat convertedMat;
+	imageToMat(image, convertedMat);
+	cv::GaussianBlur(convertedMat, convertedMat, cv::Size(filterWidth, filterHeight), 0, 0, cv::BORDER_DEFAULT);
+
+	cv::Mat horizontalDetectedImage;
+	filter2D(convertedMat, horizontalDetectedImage, CV_8U, horizontalSobelOperator, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
+
+	cv::Mat verticalDetectedImage;
+	filter2D(convertedMat, verticalDetectedImage, CV_8U, verticalSobelOperator, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
+
+	cv::Mat combinedDetectedImage;
+	float alpha = 1;
+	float beta = 1;
+	addWeighted(verticalDetectedImage, alpha, horizontalDetectedImage, beta, 0.0, combinedDetectedImage);
+
+	IntensityImage* edgeDetectedImage = ImageFactory::newIntensityImage();
+	matToImage(combinedDetectedImage, *edgeDetectedImage);
+	return edgeDetectedImage;
 }
