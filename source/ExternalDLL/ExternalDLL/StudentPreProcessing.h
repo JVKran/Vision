@@ -8,6 +8,7 @@
 #include "PreProcessing.h"
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/types_c.h"
+#include "opencv2/highgui/highgui.hpp"
 
 //void imageToMat(const IntensityImage& orignalImage, cv::Mat& destinationMat);
 //void matToImage(const cv::Mat& originalMat, IntensityImage& destinationImage);
@@ -23,6 +24,26 @@ private:
 																0, 0, 0, 1, 1, 1, 0, 0, 0,
 																0, 0, 0, 1, 1, 1, 0, 0, 0,
 																0, 0, 0, 1, 1, 1, 0, 0, 0);
+
+	cv::Mat verticalSobelOperatorLarge = (cv::Mat_<float>(9, 9) <<	-1, -1, -1, 0, 0, 0, 1, 1, 1,
+																	-1, -1, -1, 0, 0, 0, 1, 1, 1,
+																	-1, -1, -1, 0, 0, 0, 1, 1, 1,
+																	-2, -2, -2, 0, 0, 0, 2, 2, 2,
+																	-2, -2, -2, 0, 0, 0, 2, 2, 2,
+																	-2, -2, -2, 0, 0, 0, 2, 2, 2,
+																	-1, -1, -1, 0, 0, 0, 1, 1, 1,
+																	-1, -1, -1, 0, 0, 0, 1, 1, 1,
+																	-1, -1, -1, 0, 0, 0, 1, 1, 1);
+
+	cv::Mat horizontalSobelOperatorLarge = (cv::Mat_<float>(6, 6) << 1, 1, 1, 2, 2, 2, 1, 1, 1,
+																1, 1, 1, 2, 2, 2, 1, 1, 1,
+																1, 1, 1, 2, 2, 2, 1, 1, 1,
+																0, 0, 0, 0, 0, 0, 0, 0, 0,
+																0, 0, 0, 0, 0, 0, 0, 0, 0, 
+																0, 0, 0, 0, 0, 0, 0, 0, 0,
+																-1, -1, -1, -2, -2, -2, -1, -1, -1,
+																-1, -1, -1, -2, -2, -2, -1, -1, -1,
+																-1, -1, -1, -2, -2, -2, -1, -1, -1);
 
 	cv::Mat verticalSobelOperator = (cv::Mat_<float>(6, 6) <<   -1,-1, 0, 0, 1, 1,
 																-1,-1, 0, 0, 1, 1,
@@ -48,6 +69,7 @@ private:
 
 	IntensityImage * givenEdgeDetector(const IntensityImage& image) const;
 	IntensityImage * cannyEdgeDetector(const IntensityImage& image) const;
+	IntensityImage* fastCanny(const IntensityImage& image) const;
 
 public:
 	IntensityImage * stepToIntensityImage(const RGBImage &image) const;
