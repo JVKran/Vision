@@ -43,15 +43,15 @@ IntensityImage* StudentPreProcessing::stepScaleImage(const IntensityImage& image
 }
 
 IntensityImage* StudentPreProcessing::stepEdgeDetection(const IntensityImage& image) const {
-	// return givenEdgeDetector(image);
-	return cannyEdgeDetector(image);
-	// return fastCanny(image);
+	// Remember to change threshold in headerfile when another method is chosen!
+	// return givenEdgeDetector(image);		//Threshold of 220
+	return cannyEdgeDetector(image);		//Aprox threshold of 80
+	// return fastCanny(image);				results in errors...
 }
 
 IntensityImage* StudentPreProcessing::stepThresholding(const IntensityImage& image) const {
 	cv::Mat convertedMat;
 	imageToMat(image, convertedMat);
-	int threshold = 100;
 	cv::threshold(convertedMat, convertedMat, threshold, 255, cv::THRESH_BINARY_INV);
 	IntensityImage* thresholdedImage = ImageFactory::newIntensityImage();
 	matToImage(convertedMat, *thresholdedImage);

@@ -10,11 +10,13 @@
 #include "opencv2/imgproc/types_c.h"
 #include "opencv2/highgui/highgui.hpp"
 
-//void imageToMat(const IntensityImage& orignalImage, cv::Mat& destinationMat);
-//void matToImage(const cv::Mat& originalMat, IntensityImage& destinationImage);
+void imageToMat(const IntensityImage& orignalImage, cv::Mat& destinationMat);
+void matToImage(const cv::Mat& originalMat, IntensityImage& destinationImage);
 
 class StudentPreProcessing : public PreProcessing {
 private:
+	int threshold = 80;
+
 	cv::Mat givenLaplacianOperator = (cv::Mat_<float>(9, 9) <<  0, 0, 0, 1, 1, 1, 0, 0, 0,
 																0, 0, 0, 1, 1, 1, 0, 0, 0,
 																0, 0, 0, 1, 1, 1, 0, 0, 0,

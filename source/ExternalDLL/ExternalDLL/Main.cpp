@@ -4,50 +4,156 @@
 * Proprietary and confidential
 */
 
-#include <iostream> //std::cout
-#include "ImageIO.h" //Image load and save functionality
+#include <iostream>			//std::cout
+#include <chrono>			//Timing
+#include <exception>
+#include <vector>
+#include <algorithm>
+#include "StudentPreProcessing.h"
+#include "ImageIO.h"		//Image load and save functionality
 #include "HereBeDragons.h"
 #include "ImageFactory.h"
 #include "DLLExecution.h"
 
+
 void drawFeatureDebugImage(IntensityImage &image, FeatureMap &features);
-bool executeSteps(DLLExecution * executor);
+bool executeSteps(DLLExecution * executor, const bool student);
 
 int main(int argc, char * argv[]) {
 
-	ImageFactory::setImplementation(ImageFactory::DEFAULT);
-	//ImageFactory::setImplementation(ImageFactory::STUDENT);
+	std::vector<int> studentTotalTimings;
+	std::vector<int> studentEdgeDetectionTimings;
+
+	std::vector<int> defaultTotalTimings;
+	std::vector<int> defaultEdgeDetectionTimings;
+
+	std::vector<int> accuracyDifference;
 
 
-	ImageIO::debugFolder = "C:\\Users\\kraan\\source\\repos\\Vision\\testsets\\TestSet Images\\Set A";
-	ImageIO::isInDebugMode = true; //If set to false the ImageIO class will skip any image save function calls
+		ImageFactory::setImplementation(ImageFactory::DEFAULT);
+		//ImageFactory::setImplementation(ImageFactory::STUDENT);
 
 
+		ImageIO::debugFolder = "C:\\Users\\kraan\\source\\repos\\Vision\\testsets\\TestSet Images\\Set A";
+		ImageIO::isInDebugMode = true; //If set to false the ImageIO class will skip any image save function calls
 
+		for (uint_fast8_t i = 0; i < 5; i++) {
 
-	RGBImage * input = ImageFactory::newRGBImage();
-	if (!ImageIO::loadImage("C:\\Users\\kraan\\source\\repos\\Vision\\testsets\\Set A\\TestSet Images\\female-2.png", *input)) {
-		std::cout << "Image could not be loaded!" << std::endl;
-		system("pause");
-		return 0;
-	}
+			RGBImage* input = ImageFactory::newRGBImage();
+			switch (i) {
+			case 0: {
+				if (!ImageIO::loadImage("C:\\Users\\kraan\\source\\repos\\Vision\\testsets\\Set A\\TestSet Images\\child-1.png", *input)) {
+					std::cout << "Image could not be loaded!" << std::endl;
+					system("pause");
+					return 0;
+				}
+				break;
+			}
+			case 1: {
+				if (!ImageIO::loadImage("C:\\Users\\kraan\\source\\repos\\Vision\\testsets\\Set A\\TestSet Images\\female-1.png", *input)) {
+					std::cout << "Image could not be loaded!" << std::endl;
+					system("pause");
+					return 0;
+				}
+				break;
+			}
+			case 2: {
+				if (!ImageIO::loadImage("C:\\Users\\kraan\\source\\repos\\Vision\\testsets\\Set A\\TestSet Images\\female-2.png", *input)) {
+					std::cout << "Image could not be loaded!" << std::endl;
+					system("pause");
+					return 0;
+				}
+				break;
+			}
+			case 3: {
+				if (!ImageIO::loadImage("C:\\Users\\kraan\\source\\repos\\Vision\\testsets\\Set A\\TestSet Images\\female-3.png", *input)) {
+					std::cout << "Image could not be loaded!" << std::endl;
+					system("pause");
+					return 0;
+				}
+				break;
+			}
+			case 4: {
+				if (!ImageIO::loadImage("C:\\Users\\kraan\\source\\repos\\Vision\\testsets\\Set A\\TestSet Images\\male-1.png", *input)) {
+					std::cout << "Image could not be loaded!" << std::endl;
+					system("pause");
+					return 0;
+				}
+				break;
+			}
+			default: {
+				break;
+			}
+			}
 
+			for (uint_fast8_t j = 0; j < 20; j++) {
+				DLLExecution* executor = new DLLExecution(input);
 
-	ImageIO::saveRGBImage(*input, ImageIO::getDebugFileName("debug.png"));
+				auto start = std::chrono::high_resolution_clock::now();
 
-	DLLExecution * executor = new DLLExecution(input);
+				if (executeSteps(executor, true)) {
+					auto end = std::chrono::high_resolution_clock::now();
+					auto milliSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+					studentTotalTimings.push_back(milliSeconds);
+					std::cout << "Student face recognition successful in " << milliSeconds << "ms!" << std::endl;
+					std::cout << "Facial parameters: " << std::endl;
+					for (int i = 0; i < 16; i++) {
+						std::cout << (i + 1) << ": " << executor->facialParameters[i] << std::endl;
+					}
+				}
+				IntensityImage* studentResult = executor->resultPreProcessingStep4;
 
+				start = std::chrono::high_resolution_clock::now();
 
-	if (executeSteps(executor)) {
-		std::cout << "Face recognition successful!" << std::endl;
-		std::cout << "Facial parameters: " << std::endl;
-		for (int i = 0; i < 16; i++) {
-			std::cout << (i+1) << ": " << executor->facialParameters[i] << std::endl;
+				if (executeSteps(executor, false)) {
+					auto end = std::chrono::high_resolution_clock::now();
+					auto milliSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+					defaultTotalTimings.push_back(milliSeconds);
+					std::cout << "Default face recognition successful in " << milliSeconds << "ms!" << std::endl;
+					std::cout << "Facial parameters: " << std::endl;
+					for (int i = 0; i < 16; i++) {
+						std::cout << (i + 1) << ": " << executor->facialParameters[i] << std::endl;
+					}
+				}
+
+				IntensityImage* defaultResult = executor->resultPreProcessingStep4;
+
+				cv::Mat studentEdges;
+				imageToMat(*studentResult, studentEdges);
+
+				cv::Mat defaultEdges;
+				imageToMat(*defaultResult, defaultEdges);
+
+				cv::Mat result;
+				cv::compare(studentEdges, defaultEdges, result, cv::CMP_EQ);
+				accuracyDifference.push_back(countNonZero(result));
+
+				delete executor;
+			}
 		}
-	}
 
-	delete executor;
-	system("pause");
+		std::sort(studentTotalTimings.begin(), studentTotalTimings.end());
+		std::sort(defaultTotalTimings.begin(), defaultTotalTimings.end());
+
+		/* These can easily be plotted with matplotlib in the python terminal.
+		>>> import matplotlib.pyplot as plt
+		>>> defaultTimings = [31, 35, 35, 35, 35, 36, 36, 36, 36, 36, 36, 37, 37, 37, 38, 38, 40, 40, 41, 44, 45, 45, 47, 47, 48, 48, 48, 48, 49, 49, 49, 49, 49, 49, 50, 50, 50, 50, 51, 51, 51, 51, 52, 52, 52, 52, 53, 53, 53, 53, 53, 54, 54, 54, 55, 55, 56, 56, 56, 56, 56, 57, 58, 59, 59, 59, 60, 60, 61, 61, 65, 67, 69, 69, 70, 77, 82, 87, 91, 92]
+		>>> num_bins = 20
+		>>> plt.hist(defaultTimings, num_bins)
+		>>> plt.show()
+		*/
+
+		std::cout << "Student total timings:" << std::endl << '[';
+		for (const auto& milliSeconds : studentTotalTimings) {
+			std::cout << milliSeconds << ',';
+		}
+		std::cout << ']' << std::endl << "Default timings: " << std::endl << ']';
+		for (const auto& milliSeconds : defaultTotalTimings) {
+			std::cout << milliSeconds << ',';
+		}
+
+		system("pause");
+	
 	return 1;
 }
 
@@ -60,7 +166,7 @@ int main(int argc, char * argv[]) {
 
 
 
-bool executeSteps(DLLExecution * executor) {
+bool executeSteps(DLLExecution * executor, const bool student) {
 
 	//Execute the four Pre-processing steps
 	if (!executor->executePreProcessingStep1(false)) {
@@ -74,13 +180,13 @@ bool executeSteps(DLLExecution * executor) {
 	}
 	ImageIO::saveIntensityImage(*executor->resultPreProcessingStep2, ImageIO::getDebugFileName("Pre-processing-2.png"));
 
-	if (!executor->executePreProcessingStep3(false)) {
+	if (!executor->executePreProcessingStep3(student)) {
 		std::cout << "Pre-processing step 3 failed!" << std::endl;
 		return false;
 	}
 	ImageIO::saveIntensityImage(*executor->resultPreProcessingStep3, ImageIO::getDebugFileName("Pre-processing-3.png"));
 
-	if (!executor->executePreProcessingStep4(false)) {
+	if (!executor->executePreProcessingStep4(student)) {
 		std::cout << "Pre-processing step 4 failed!" << std::endl;
 		return false;
 	}
