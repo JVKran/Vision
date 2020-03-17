@@ -180,4 +180,44 @@
       <double>1.1999999999999982</double>
     </Parameters>
   </name>
+  <name Name="ed" ImagePath="TestSet Images\ed.png">
+    <Parameters>
+      <double>2.9993317048570263</double>
+      <double>0.66370370370370357</double>
+      <double>0.640205444892581</double>
+      <double>0</double>
+      <double>1.27271773458541</double>
+      <double>0.99623559200293932</double>
+      <double>1.0569737738338381</double>
+      <double>2.8375882307655265</double>
+      <double>0.54283945977039638</double>
+      <double>0.059069255491960751</double>
+      <double>0.74999999999999989</double>
+      <double>0.28571428571428559</double>
+      <double>0.25063694370746786</double>
+      <double>0.41071428571428575</double>
+      <double>2.6186491652598489</double>
+      <double>2.6250000000000004</double>
+    </Parameters>
+  </name>
+  <name Name="ed" ImagePath="TestSet Images\ed1.png">
+    <Parameters>
+      <double>2.9993317048570263</double>
+      <double>0.66370370370370357</double>
+      <double>0.640205444892581</double>
+      <double>0</double>
+      <double>1.27271773458541</double>
+      <double>0.99623559200293932</double>
+      <double>1.0569737738338381</double>
+      <double>2.8375882307655265</double>
+      <double>0.54283945977039638</double>
+      <double>0.059069255491960751</double>
+      <double>0.74999999999999989</double>
+      <double>0.28571428571428559</double>
+      <double>0.25063694370746786</double>
+      <double>0.41071428571428575</double>
+      <double>2.6186491652598489</double>
+      <double>2.6250000000000004</double>
+    </Parameters>
+  </name>
 </TestSetFile>

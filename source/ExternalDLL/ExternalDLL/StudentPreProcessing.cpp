@@ -74,7 +74,7 @@ IntensityImage* StudentPreProcessing::givenEdgeDetector(const IntensityImage& im
 IntensityImage* StudentPreProcessing::cannyEdgeDetector(const IntensityImage& image) const {
 	int filterWidth = 3;
 	int filterHeight = 3;
-	float standardDeviation = 2;
+	float standardDeviation = 0.2;
 	cv::Mat convertedMat;
 	imageToMat(image, convertedMat);
 	// http://dev.theomader.com/gaussian-kernel-calculator/
@@ -119,4 +119,33 @@ IntensityImage* StudentPreProcessing::fastCanny(const IntensityImage& image) con
 	matToImage(edgeDetectedImage, *finishedImage);
 	cv::imshow("detected", edgeDetectedImage);
 	return finishedImage;
+}
+
+IntensityImage* StudentPreProcessing::sobelEdgeDetector(const IntensityImage& image) const{
+	int filterWidth = 3;
+	int filterHeight = 3;
+	float standardDeviation = 0.2;
+	cv::Mat convertedMat;
+	imageToMat(image, convertedMat);
+	// http://dev.theomader.com/gaussian-kernel-calculator/
+	// cv::GaussianBlur(convertedMat, convertedMat, cv::Size(filterWidth, filterHeight), standardDeviation, standardDeviation, cv::BORDER_DEFAULT);
+
+	cv::Mat horizontalDetectedImage;
+	//filter2D(convertedMat, horizontalDetectedImage, CV_8U, horizontalSobelOperator, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);		// Werkt soort van.
+	Sobel(convertedMat, horizontalDetectedImage, CV_8U, 0, 1, 3);																		// Werkt ook soort van.
+	//													x, y, maskSize
+
+	cv::Mat verticalDetectedImage;
+	//filter2D(convertedMat, verticalDetectedImage, CV_8U, verticalSobelOperator, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
+	Sobel(convertedMat, verticalDetectedImage, CV_8U, 1, 0, 3);
+	//												  x, y, maskSize
+
+	cv::Mat combinedDetectedImage;
+	float verticalWeight = 1;
+	float horizontalWeight = 1;
+	combinedDetectedImage = verticalDetectedImage * verticalWeight + horizontalDetectedImage * horizontalWeight;		// Combineert afbeeldingen.
+
+	IntensityImage* edgeDetectedImage = ImageFactory::newIntensityImage();
+	matToImage(combinedDetectedImage, *edgeDetectedImage);
+	return edgeDetectedImage;
 }

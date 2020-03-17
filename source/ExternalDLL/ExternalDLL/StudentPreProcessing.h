@@ -15,7 +15,8 @@ void matToImage(const cv::Mat& originalMat, IntensityImage& destinationImage);
 
 class StudentPreProcessing : public PreProcessing {
 private:
-	int threshold = 80;
+	int threshold = 70;
+	// 70 works with 3 maskSize and seperable mask
 
 	cv::Mat givenLaplacianOperator = (cv::Mat_<float>(9, 9) <<  0, 0, 0, 1, 1, 1, 0, 0, 0,
 																0, 0, 0, 1, 1, 1, 0, 0, 0,
@@ -72,6 +73,7 @@ private:
 	IntensityImage * givenEdgeDetector(const IntensityImage& image) const;
 	IntensityImage * cannyEdgeDetector(const IntensityImage& image) const;
 	IntensityImage* fastCanny(const IntensityImage& image) const;
+	IntensityImage* sobelEdgeDetector(const IntensityImage& image) const;
 
 public:
 	IntensityImage * stepToIntensityImage(const RGBImage &image) const;

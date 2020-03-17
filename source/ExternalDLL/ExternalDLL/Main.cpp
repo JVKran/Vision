@@ -4,13 +4,13 @@
 * Proprietary and confidential
 */
 
-#include <iostream>			//std::cout
-#include <chrono>			//Timing
+#include <iostream>			// std::cout
+#include <chrono>			// Timing
 #include <exception>
 #include <vector>
 #include <algorithm>
 #include "StudentPreProcessing.h"
-#include "ImageIO.h"		//Image load and save functionality
+#include "ImageIO.h"		// Image load and save functionality
 #include "HereBeDragons.h"
 #include "ImageFactory.h"
 #include "DLLExecution.h"
