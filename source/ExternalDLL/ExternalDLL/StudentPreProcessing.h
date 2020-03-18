@@ -15,10 +15,12 @@ void matToImage(const cv::Mat& originalMat, IntensityImage& destinationImage);
 
 class StudentPreProcessing : public PreProcessing {
 private:
-	int threshold = 70;
-	// 70 works with 3 maskSize and seperable mask
+	int threshold = 60;
+	// 70 works for sobel and canny
+	// 220 works for laplacian.
 
-	cv::Mat givenLaplacianOperator = (cv::Mat_<float>(9, 9) <<  0, 0, 0, 1, 1, 1, 0, 0, 0,
+
+	cv::Mat laplacianOperatorLarge = (cv::Mat_<float>(9, 9) <<  0, 0, 0, 1, 1, 1, 0, 0, 0,
 																0, 0, 0, 1, 1, 1, 0, 0, 0,
 																0, 0, 0, 1, 1, 1, 0, 0, 0,
 																1, 1, 1,-4,-4,-4, 1, 1, 1,
@@ -55,7 +57,7 @@ private:
 																-1,-1, 0, 0, 1, 1,
 																-1,-1, 0, 0, 1, 1);
 
-	cv::Mat verticalSobelOperatorSmall = (cv::Mat_<float>(6, 6) <<	-1, 0, 1,
+	cv::Mat verticalSobelOperatorSmall = (cv::Mat_<float>(3, 3) <<	-1, 0, 1,
 																	-2, 0, 2,
 																	-1, 0, 1);
 
@@ -66,14 +68,15 @@ private:
 																-1,-1,-2,-2,-1,-1,
 																-1,-1,-2,-2,-1,-1);
 
-	cv::Mat horizontalSobelOperatorSmall = (cv::Mat_<float>(6, 6) << 1, 2, 1,
-																0, 0, 0,
-																-1,-2,-1);
+	cv::Mat horizontalSobelOperatorSmall = (cv::Mat_<float>(3, 3) << 1, 2, 1,
+																	0, 0, 0,
+																	-1,-2,-1);
 
-	IntensityImage * givenEdgeDetector(const IntensityImage& image) const;
-	IntensityImage * cannyEdgeDetector(const IntensityImage& image) const;
+
+	IntensityImage * laplacianOperator(const IntensityImage& image) const;		// Works; 220
+	IntensityImage * cannyOperator(const IntensityImage& image) const;
 	IntensityImage* fastCanny(const IntensityImage& image) const;
-	IntensityImage* sobelEdgeDetector(const IntensityImage& image) const;
+	IntensityImage* sobelOperator(const IntensityImage& image) const;			// Works; 70
 
 public:
 	IntensityImage * stepToIntensityImage(const RGBImage &image) const;
