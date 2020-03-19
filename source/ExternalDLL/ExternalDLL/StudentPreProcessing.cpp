@@ -45,8 +45,8 @@ IntensityImage* StudentPreProcessing::stepScaleImage(const IntensityImage& image
 IntensityImage* StudentPreProcessing::stepEdgeDetection(const IntensityImage& image) const {
 	// Remember to change threshold in headerfile when another method is chosen!
 	// return laplacianOperator(image);		//Threshold of 220
-	return cannyOperator(image);		//Aprox threshold of 70
-	// return sobelOperator(image);			//Threshold of 70
+	// return cannyOperator(image);		//Aprox threshold of 70
+	return sobelOperator(image);			//Threshold of 70
 	// return fastCanny(image);
 }
 

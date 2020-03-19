@@ -15,7 +15,7 @@ void matToImage(const cv::Mat& originalMat, IntensityImage& destinationImage);
 
 class StudentPreProcessing : public PreProcessing {
 private:
-	int threshold = 60;
+	int threshold = 70;
 	// 70 works for sobel and canny
 	// 220 works for laplacian.
 
