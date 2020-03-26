@@ -19,8 +19,8 @@ private:
 	// 70 works for sobel and canny
 	// 220 works for laplacian.
 
-
-	cv::Mat laplacianOperatorLarge = (cv::Mat_<float>(9, 9) <<  0, 0, 0, 1, 1, 1, 0, 0, 0,
+	//this is the laplacian sobel opertator used in the function laplacianOperator
+	cv::Mat laplacianOperatorLarge = (cv::Mat_<float>(9, 9) <<  0, 0, 0, 1, 1, 1, 0, 0, 0,			
 																0, 0, 0, 1, 1, 1, 0, 0, 0,
 																0, 0, 0, 1, 1, 1, 0, 0, 0,
 																1, 1, 1,-4,-4,-4, 1, 1, 1,
@@ -30,50 +30,19 @@ private:
 																0, 0, 0, 1, 1, 1, 0, 0, 0,
 																0, 0, 0, 1, 1, 1, 0, 0, 0);
 
-	cv::Mat verticalSobelOperatorLarge = (cv::Mat_<float>(9, 9) <<	-1, -1, -1, 0, 0, 0, 1, 1, 1,
-																	-1, -1, -1, 0, 0, 0, 1, 1, 1,
-																	-1, -1, -1, 0, 0, 0, 1, 1, 1,
-																	-2, -2, -2, 0, 0, 0, 2, 2, 2,
-																	-2, -2, -2, 0, 0, 0, 2, 2, 2,
-																	-2, -2, -2, 0, 0, 0, 2, 2, 2,
-																	-1, -1, -1, 0, 0, 0, 1, 1, 1,
-																	-1, -1, -1, 0, 0, 0, 1, 1, 1,
-																	-1, -1, -1, 0, 0, 0, 1, 1, 1);
 
-	cv::Mat horizontalSobelOperatorLarge = (cv::Mat_<float>(6, 6) << 1, 1, 1, 2, 2, 2, 1, 1, 1,
-																1, 1, 1, 2, 2, 2, 1, 1, 1,
-																1, 1, 1, 2, 2, 2, 1, 1, 1,
-																0, 0, 0, 0, 0, 0, 0, 0, 0,
-																0, 0, 0, 0, 0, 0, 0, 0, 0, 
-																0, 0, 0, 0, 0, 0, 0, 0, 0,
-																-1, -1, -1, -2, -2, -2, -1, -1, -1,
-																-1, -1, -1, -2, -2, -2, -1, -1, -1,
-																-1, -1, -1, -2, -2, -2, -1, -1, -1);
-
-	cv::Mat verticalSobelOperator = (cv::Mat_<float>(6, 6) <<   -1,-1, 0, 0, 1, 1,
-																-1,-1, 0, 0, 1, 1,
-																-2,-2, 0, 0, 2, 2,
-																-2,-2, 0, 0, 2, 2,
-																-1,-1, 0, 0, 1, 1,
-																-1,-1, 0, 0, 1, 1);
-
-	cv::Mat verticalSobelOperatorSmall = (cv::Mat_<float>(3, 3) <<	-1, 0, 1,
+	//this is the vertical sobel opertator used in the function sobelOperator and cannyOperator
+	cv::Mat verticalSobelOperatorSmall = (cv::Mat_<float>(3, 3) <<	-1, 0, 1,				
 																	-2, 0, 2,
 																	-1, 0, 1);
 
-	cv::Mat horizontalSobelOperator = (cv::Mat_<float>(6, 6) << 1, 1, 2, 2, 1, 1,
-																1, 1, 2, 2, 1, 1,
-																0, 0, 0, 0, 0, 0,
-																0, 0, 0, 0, 0, 0,
-																-1,-1,-2,-2,-1,-1,
-																-1,-1,-2,-2,-1,-1);
-
-	cv::Mat horizontalSobelOperatorSmall = (cv::Mat_<float>(3, 3) << 1, 2, 1,
+	//this is the horizontal sobel opertator used in the function sobelOperator and cannyOperator
+	cv::Mat horizontalSobelOperatorSmall = (cv::Mat_<float>(3, 3) << 1, 2, 1,		
 																	0, 0, 0,
 																	-1,-2,-1);
-
-	cv::Mat gaussianOperator = (cv::Mat_<float>(5, 5) <<	0.000252, 0.00352, 0.008344, 0.00352, 0.000252,
-															0.00352, 0.049081, 0.11634, 0.049081, 0.00352,
+	//this  is the Gaussian mask with a standard deviation of 0.7 used in the cannyOperator function
+	cv::Mat gaussianOperator = (cv::Mat_<float>(5, 5) <<	0.000252, 0.00352, 0.008344, 0.00352, 0.000252,			
+															0.00352, 0.049081, 0.11634, 0.049081, 0.00352,		
 															0.008344, 0.11634, 0.275768, 0.11634, 0.008344,
 															0.00352, 0.049081, 0.11634, 0.049081, 0.00352,
 															0.000252, 0.00352, 0.008344, 0.00352, 0.000252);
