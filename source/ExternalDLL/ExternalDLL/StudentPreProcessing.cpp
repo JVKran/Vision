@@ -10,6 +10,10 @@
 #include "ImageFactory.h"
 #include "HereBeDragons.h"
 
+/* Convert IntensityImage to cv::Mat
+   This function converts the first parameter (an IntensityImage) to the type
+   of the second parameter (a cv::Mat).
+*/
 void imageToMat(const IntensityImage& orignalImage, cv::Mat& destinationMat) {
 	destinationMat.create(orignalImage.getHeight(), orignalImage.getWidth(), CV_8UC1);
 
@@ -20,6 +24,10 @@ void imageToMat(const IntensityImage& orignalImage, cv::Mat& destinationMat) {
 	}
 }
 
+/* Convert cv::Mat to IntensityImage
+   This function converts the first parameter (a cv::Mat) to the type
+   of the second parameter (an IntensityImage).
+*/
 void matToImage(const cv::Mat& originalMat, IntensityImage& destinationImage) {
 	if (originalMat.type() != CV_8UC1) {
 		throw std::exception("OpenCV Mat image not an 8-bit single channel image!");
@@ -44,12 +52,15 @@ IntensityImage* StudentPreProcessing::stepScaleImage(const IntensityImage& image
 
 IntensityImage* StudentPreProcessing::stepEdgeDetection(const IntensityImage& image) const {
 	// Remember to change threshold in headerfile when another method is chosen!
-	// return laplacianOperator(image);		//Threshold of 220
-	// return cannyOperator(image);		//Aprox threshold of 70
-	return sobelOperator(image);			//Threshold of 70
-	// return fastCanny(image);
+
+	// return laplacianOperator(image);
+	// return cannyOperator(image);
+	return sobelOperator(image);
 }
 
+/* Thresholding
+   This function applies the thresholding to the given parameter.
+*/
 IntensityImage* StudentPreProcessing::stepThresholding(const IntensityImage& image) const {
 	cv::Mat convertedMat;
 	imageToMat(image, convertedMat);
@@ -59,27 +70,36 @@ IntensityImage* StudentPreProcessing::stepThresholding(const IntensityImage& ima
 	return thresholdedImage;
 }
 
-// All implemented edge detectors are listed below.
-
+/* Laplacian Operator
+   This function implements the Laplacian Operator by applying the large Laplacian Operator.
+   This image is then converted to an IntensityImage after which it is returned.
+*/
 IntensityImage* StudentPreProcessing::laplacianOperator(const IntensityImage& image) const {
 	cv::Mat convertedMat;
 	imageToMat(image, convertedMat);
 	cv::Mat FilteredImage;
+
 	filter2D(convertedMat, FilteredImage, CV_8U, laplacianOperatorLarge, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
 	IntensityImage* edgeDetectedImage = ImageFactory::newIntensityImage();
+
 	matToImage(FilteredImage, *edgeDetectedImage);
 	return edgeDetectedImage;
 }
 
+/* Sobel Operator
+   This function implements the Sobel Operator by applying the small horizontal en vertical
+   sobel operators. Lastly, the two filtered images are combined.
+   This combined image is then converted to an IntensityImage after which it is returned.
+*/
 IntensityImage* StudentPreProcessing::sobelOperator(const IntensityImage& image) const {
 	cv::Mat convertedMat;
 	imageToMat(image, convertedMat);
 
 	cv::Mat horizontalDetectedImage;
-	Sobel(convertedMat, horizontalDetectedImage, CV_8U, 0, 1, 3);
+	filter2D(convertedMat, horizontalDetectedImage, CV_8U, horizontalSobelOperatorSmall, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
 
 	cv::Mat verticalDetectedImage;
-	Sobel(convertedMat, verticalDetectedImage, CV_8U, 1, 0, 3);
+	filter2D(convertedMat, verticalDetectedImage, CV_8U, verticalSobelOperatorSmall, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
 
 	cv::Mat combinedDetectedImage;
 	combinedDetectedImage = verticalDetectedImage + horizontalDetectedImage;
@@ -89,14 +109,18 @@ IntensityImage* StudentPreProcessing::sobelOperator(const IntensityImage& image)
 	return edgeDetectedImage;
 }
 
-
+/* Canny Operator
+   This function implements the Canny Operator by first applying a Gaussian Mask after which the
+   small horizontal and vertical operator are applied. Lastly, the two filtered images are combined.
+   This combined image is then converted to an IntensityImage after which it is returned.
+*/
 IntensityImage* StudentPreProcessing::cannyOperator(const IntensityImage& image) const {
 	int filterWidth = 5;
 	int filterHeight = 5;
 	float standardDeviation = 0.7;
 	cv::Mat convertedMat;
 	imageToMat(image, convertedMat);
-	cv::GaussianBlur(convertedMat, convertedMat, cv::Size(filterWidth, filterHeight), standardDeviation, standardDeviation, cv::BORDER_DEFAULT);
+	filter2D(convertedMat, convertedMat, CV_8U, gaussianOperator, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
 
 	cv::Mat horizontalDetectedImage;
 	filter2D(convertedMat, horizontalDetectedImage, CV_8U, horizontalSobelOperatorSmall, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
@@ -113,23 +137,3 @@ IntensityImage* StudentPreProcessing::cannyOperator(const IntensityImage& image)
 	matToImage(combinedDetectedImage, *edgeDetectedImage);
 	return edgeDetectedImage;
 }
-
-IntensityImage* StudentPreProcessing::fastCanny(const IntensityImage& image) const{
-	cv::Mat originalImage;
-	imageToMat(image, originalImage);
-	cv::Mat imageGrey, edgeDetectedImage;
-	edgeDetectedImage.create(originalImage.size(), originalImage.type());
-
-	int edgeThresh = 1;
-	int lowThreshold = 50;
-	int const max_lowThreshold = 100;
-	int ratio = 3;
-	int kernel_size = 3;
-
-	blur(originalImage, edgeDetectedImage, cv::Size(3, 3));
-	cv::Canny(edgeDetectedImage, edgeDetectedImage, lowThreshold, lowThreshold * ratio, kernel_size);
-	IntensityImage* finishedImage = ImageFactory::newIntensityImage();
-	matToImage(edgeDetectedImage, *finishedImage);
-	return finishedImage;
-}
-

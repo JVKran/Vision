@@ -72,12 +72,21 @@ private:
 																	0, 0, 0,
 																	-1,-2,-1);
 
+	cv::Mat gaussianOperator = (cv::Mat_<float>(5, 5) <<	0.000252, 0.00352, 0.008344, 0.00352, 0.000252,
+															0.00352, 0.049081, 0.11634, 0.049081, 0.00352,
+															0.008344, 0.11634, 0.275768, 0.11634, 0.008344,
+															0.00352, 0.049081, 0.11634, 0.049081, 0.00352,
+															0.000252, 0.00352, 0.008344, 0.00352, 0.000252);
 
-	IntensityImage * laplacianOperator(const IntensityImage& image) const;		// Works; 220
+
+	// This function implements the laplacian operator by using the large laplacian operator above.
+	IntensityImage * laplacianOperator(const IntensityImage& image) const;
+
+	// This function implements the laplacian operator by using the small horizontal and vertical sobel operators.
 	IntensityImage * cannyOperator(const IntensityImage& image) const;
-	IntensityImage* fastCanny(const IntensityImage& image) const;
-	IntensityImage* sobelOperator(const IntensityImage& image) const;			// Works; 70
 
+	// This function implements the laplacian operator by using the small horizontal and vertical sobel operators.
+	IntensityImage* sobelOperator(const IntensityImage& image) const;
 public:
 	IntensityImage * stepToIntensityImage(const RGBImage &image) const;
 	IntensityImage * stepScaleImage(const IntensityImage &image) const;
